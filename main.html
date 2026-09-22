@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Menú semanal — Matías</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #faf6ef;
+    --paper-card: #ffffff;
+    --ink: #2b2621;
+    --ink-soft: #6b6259;
+    --line: #e6dfd2;
+    --amber: #b8792e;
+    --amber-bg: #f8ecd9;
+    --rust: #a44a2f;
+    --rust-bg: #f7e5dd;
+    --dusk: #2f4a5e;
+    --dusk-bg: #e2ebef;
+    --chip-bg: #f1ece1;
+    --chip-active: #2b2621;
+    --chip-active-text: #faf6ef;
+    --shadow: 0 1px 2px rgba(43,38,33,0.06);
+    --green: #4d7a56;
+    --green-bg: #e5efe4;
+
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #1c1a17;
+      --paper-card: #262320;
+      --ink: #f2ece2;
+      --ink-soft: #b8ada0;
+      --line: #3a352e;
+      --amber-bg: #3a2f1c;
+      --rust-bg: #3a241d;
+      --dusk-bg: #1e2c34;
+      --chip-bg: #2f2b25;
+      --chip-active: #f2ece2;
+      --chip-active-text: #1c1a17;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3);
+      --green-bg: #223327;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #1c1a17;
+    --paper-card: #262320;
+    --ink: #f2ece2;
+    --ink-soft: #b8ada0;
+    --line: #3a352e;
+    --amber-bg: #3a2f1c;
+    --rust-bg: #3a241d;
+    --dusk-bg: #1e2c34;
+    --chip-bg: #2f2b25;
+    --chip-active: #f2ece2;
+    --chip-active-text: #1c1a17;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3);
+    --green-bg: #223327;
+  }
+
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body.modal-open { overflow: hidden; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 20px 64px; }
+  header.top { padding-top: env(safe-area-inset-top, 0px); }
+
+  .eyebrow-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  h1 { font-family: 'Fraunces', serif; font-weight: 500; font-size: clamp(28px, 5vw, 38px); letter-spacing: -0.01em; margin: 2px 0 4px; }
+  .subtitle { color: var(--ink-soft); font-size: 14.5px; margin: 0; max-width: 60ch; line-height: 1.5; }
+
+  .build-btn {
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 11px 18px;
+    border-radius: 100px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  details.rules { border: 1px solid var(--line); border-radius: 10px; background: var(--paper-card); margin-bottom: 22px; overflow: hidden; }
+  details.rules summary { cursor: pointer; list-style: none; padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 600; }
+  details.rules summary::-webkit-details-marker { display: none; }
+  summary .chevron { color: var(--ink-soft); transition: transform 0.2s ease; font-size: 12px; }
+  details[open] summary .chevron { transform: rotate(180deg); }
+  .rules-body { padding: 0 16px 16px; font-size: 13.5px; line-height: 1.65; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 12px; }
+  .rules-body ol { margin: 0; padding-left: 18px; }
+  .rules-body li { margin-bottom: 6px; }
+  .rules-body strong { color: var(--ink); }
+
+  .search-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); padding: 10px 0 14px; }
+  .search-input-row { position: relative; }
+  input#search {
+    width: 100%; font-family: inherit; font-size: 16px; padding: 13px 16px 13px 42px;
+    border-radius: 10px; border: 1px solid var(--line); background: var(--paper-card); color: var(--ink); outline: none;
+  }
+  input#search:focus { border-color: var(--ink-soft); }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-soft); pointer-events: none; }
+
+  .filters { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .chip {
+    border: 1px solid var(--line); background: var(--chip-bg); color: var(--ink); font-family: inherit;
+    font-size: 13.5px; font-weight: 500; padding: 7px 14px; border-radius: 100px; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { background: var(--chip-active); color: var(--chip-active-text); border-color: var(--chip-active); }
+
+  .kcal-filter { margin-top: 16px; }
+  .kcal-filter-head { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; }
+  .kcal-filter-head span:last-child { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .range-slider { position: relative; height: 26px; }
+  .range-track { position: absolute; top: 50%; left: 0; right: 0; height: 3px; transform: translateY(-50%); background: var(--line); border-radius: 3px; }
+  .range-fill { position: absolute; top: 50%; height: 3px; transform: translateY(-50%); background: var(--ink-soft); border-radius: 3px; }
+  .range-slider input[type="range"] {
+    position: absolute; top: 0; left: 0; width: 100%; margin: 0;
+    -webkit-appearance: none; appearance: none; background: none; pointer-events: none; height: 26px;
+  }
+  .range-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; pointer-events: auto; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--ink); border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--line); cursor: pointer; margin-top: 4px;
+  }
+  .range-slider input[type="range"]::-moz-range-thumb {
+    pointer-events: auto; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); border: 2px solid var(--paper); cursor: pointer;
+  }
+  .range-slider input[type="range"]::-webkit-slider-runnable-track { background: transparent; }
+  .range-slider input[type="range"]::-moz-range-track { background: transparent; }
+
+  .count-row { color: var(--ink-soft); font-size: 13px; margin: 16px 2px 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+
+  .card {
+    background: var(--paper-card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 16px 15px;
+    box-shadow: var(--shadow); border-left: 3px solid var(--tag-color); cursor: pointer; text-align: left;
+    width: 100%; font-family: inherit; -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none; appearance: none; color: var(--ink);
+  }
+  .card h3, .card .macro-row, .card .ingredients, .card .open-hint { color: var(--ink); }
+  .card .macro-row, .card .ingredients, .card .open-hint { color: var(--ink-soft); }
+  .card:active { background: var(--chip-bg); }
+  .card[data-type="desayuno"] { --tag-color: var(--amber); }
+  .card[data-type="almuerzo"] { --tag-color: var(--rust); }
+  .card[data-type="cena"]     { --tag-color: var(--dusk); }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .tag { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 100px; white-space: nowrap; }
+  .card[data-type="desayuno"] .tag { background: var(--amber-bg); color: var(--amber); }
+  .card[data-type="almuerzo"] .tag { background: var(--rust-bg); color: var(--rust); }
+  .card[data-type="cena"] .tag { background: var(--dusk-bg); color: var(--dusk); }
+  .open-hint { color: var(--ink-soft); font-size: 16px; line-height: 1; }
+  .card h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1.25; margin: 0 0 8px; }
+  .macro-row { display: flex; gap: 12px; font-size: 12px; color: var(--ink-soft); margin-bottom: 10px; font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+  .macro-row b { color: var(--ink); font-weight: 600; }
+  .ingredients { margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; }
+  .ingredients li { padding-left: 14px; position: relative; }
+  .ingredients li::before { content: "·"; position: absolute; left: 2px; color: var(--tag-color); font-weight: 700; }
+  mark { background: var(--tag-color); color: var(--paper-card); padding: 0 2px; border-radius: 3px; }
+  .empty { text-align: center; color: var(--ink-soft); padding: 60px 20px; font-size: 14.5px; }
+
+  /* ---- Modals ---- */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(20, 17, 14, 0.5); z-index: 100;
+    padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-panel {
+    background: var(--paper); border-radius: 16px; width: 100%; max-width: 720px; max-height: 100%;
+    overflow-y: auto; padding: 22px 22px 26px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 4px; }
+  .modal-head h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; margin: 0 0 4px; }
+  .modal-close {
+    background: var(--chip-bg); border: none; color: var(--ink); width: 32px; height: 32px; border-radius: 50%;
+    font-size: 16px; cursor: pointer; flex-shrink: 0; line-height: 1;
+  }
+
+  .meal-toggle { display: flex; gap: 8px; margin: 14px 0 18px; }
+
+  .ing-group { margin-bottom: 18px; }
+  .ing-group-title { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 8px; }
+  .ing-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ing-chip {
+    border: 1px solid var(--line); background: var(--paper-card); color: var(--ink); font-family: inherit;
+    font-size: 13px; padding: 7px 12px; border-radius: 9px; cursor: pointer; text-align: left;
+  }
+  .ing-chip[aria-pressed="true"] { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 600; }
+
+  .plate-panel { margin-top: 22px; background: var(--paper-card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .plate-panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .plate-panel-head h3 { font-size: 14px; margin: 0; font-weight: 600; }
+  .clear-btn { background: none; border: none; color: var(--ink-soft); font-size: 12.5px; cursor: pointer; text-decoration: underline; padding: 4px; }
+  .plate-empty { color: var(--ink-soft); font-size: 13.5px; padding: 10px 0; }
+
+  .plate-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .plate-item-name { flex: 1; font-size: 13.5px; }
+  .plate-item-macros { font-size: 11.5px; color: var(--ink-soft); }
+  .grams-input {
+    width: 60px; font-family: inherit; font-size: 13.5px; text-align: right; padding: 5px 6px;
+    border-radius: 6px; border: 1px solid var(--line); background: var(--paper); color: var(--ink);
+  }
+  .grams-unit { font-size: 12px; color: var(--ink-soft); }
+  .remove-btn { background: none; border: none; color: var(--ink-soft); font-size: 16px; cursor: pointer; line-height: 1; padding: 4px; }
+
+  .totals-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .total-stat { text-align: center; }
+  .total-stat .val { font-family: 'Fraunces', serif; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .total-stat .lab { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .total-stat .status { display: inline-block; margin-top: 6px; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 100px; letter-spacing: 0.01em; }
+  .status[data-state="ok"]    { background: var(--green-bg); color: var(--green); }
+  .status[data-state="alto"]  { background: var(--rust-bg);  color: var(--rust); }
+  .status[data-state="bajo"]  { background: var(--dusk-bg);  color: var(--dusk); }
+  .status[data-state="vacio"] { background: var(--chip-bg);  color: var(--ink-soft); }
+  .target-note { font-size: 11.5px; color: var(--ink-soft); text-align: center; margin-top: 10px; }
+  .disclaimer { font-size: 12px; color: var(--ink-soft); margin-top: 14px; line-height: 1.5; }
+
+  /* Recipe modal */
+  .recipe-tag-row { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; flex-wrap: wrap; }
+  .recipe-macros { display: flex; gap: 16px; margin: 14px 0 20px; padding: 14px; background: var(--paper-card); border: 1px solid var(--line); border-radius: 10px; }
+  .recipe-macros .m { text-align: center; flex: 1; }
+  .recipe-macros .m .v { font-family: 'Fraunces', serif; font-size: 19px; }
+  .recipe-macros .m .l { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+  .recipe-section-title { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin: 18px 0 8px; }
+  .recipe-ing-list { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.7; }
+  .recipe-steps { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.7; }
+  .recipe-steps li { margin-bottom: 6px; }
+
+  @media (max-width: 420px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow-row">
+      <div>
+        <h1>Menú de la semana</h1>
+        <p class="subtitle">Pauta de Belén Araya — 8 desayunos, 15 almuerzos y 15 cenas para armar tu semana sin repetir. Tocá un plato para ver su receta.</p>
+      </div>
+      <button class="build-btn" id="openBuilder">🍽️ Armar mi plato</button>
+    </div>
+
+    <details class="rules">
+      <summary>Reglas y restricciones <span class="chevron">▾</span></summary>
+      <div class="rules-body">
+        <ol>
+          <li><strong>Proteína magra</strong> (almuerzo y cena): 200 g en crudo, o 1½ lata de atún al agua bien enjuagada.</li>
+          <li><strong>Verduras</strong> (almuerzo y cena): mínimo 200 g / 2 tazas de consumo libre. Zanahoria, betarraga y zapallo cocido: máx. ½ taza/día.</li>
+          <li><strong>Carbohidrato complejo</strong> (solo almuerzo): 100 g cocido (¾ taza o 3 cdas soperas) de arroz integral, quínoa, fideos integrales o cuscús; o 1 papa pequeña asada con piel (150 g).</li>
+          <li><strong>Cena sin carbohidratos</strong>: prohibidos arroz, fideos, papas o pan — salvo días de ejercicio intenso, donde se agregan 70 g de arroz/quínoa.</li>
+          <li><strong>Aceite</strong>: máximo ½ cdta de oliva por comida principal.</li>
+          <li><strong>Hidratación</strong>: mínimo 2.5 L/día. 1-2 vasos de agua antes de cada comida.</li>
+          <li><strong>Postre opcional</strong> en almuerzo: 1 jalea sin azúcar Regimel (~10 kcal) o 6 merenguitos Beshos (~15 kcal).</li>
+          <li><strong>Colación PM fija</strong>: 1 snack proteico (½ barra Twenty o 1 yogur proteico 120 g) + 1 fruta (berries o 1 unidad pequeña de manzana/naranja/pera).</li>
+        </ol>
+      </div>
+    </details>
+  </header>
+
+  <div class="search-bar">
+    <div class="search-input-row">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" type="text" placeholder="Buscar por plato o ingrediente (ej. pollo, quínoa, atún)…" autocomplete="off">
+    </div>
+    <div class="filters" id="filters">
+      <button class="chip" data-filter="todos" aria-pressed="true">Todos</button>
+      <button class="chip" data-filter="desayuno" aria-pressed="false">Desayuno</button>
+      <button class="chip" data-filter="almuerzo" aria-pressed="false">Almuerzo</button>
+      <button class="chip" data-filter="cena" aria-pressed="false">Cena</button>
+    </div>
+    <div class="kcal-filter">
+      <div class="kcal-filter-head"><span>Calorías por plato</span><span id="kcalRangeLabel"></span></div>
+      <div class="range-slider">
+        <div class="range-track"></div>
+        <div class="range-fill" id="rangeFill"></div>
+        <input type="range" id="kcalMin">
+        <input type="range" id="kcalMax">
+      </div>
+    </div>
+  </div>
+
+  <p class="count-row" id="count"></p>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none;">Sin resultados. Probá con otra palabra o ampliá el rango de calorías.</div>
+</div>
+
+<!-- Modal: Arma tu plato -->
+<div class="modal-overlay" id="builderOverlay">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="builderTitle">
+    <div class="modal-head">
+      <div>
+        <h2 id="builderTitle">Arma tu plato</h2>
+        <p class="subtitle" style="margin-bottom:0;">Elegí ingredientes de los que recomienda la pauta y mirá en tiempo real cómo va tu plato.</p>
+      </div>
+      <button class="modal-close" id="closeBuilder" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="meal-toggle" id="mealToggle">
+      <button class="chip" data-meal="almuerzo" aria-pressed="true">Almuerzo</button>
+      <button class="chip" data-meal="cena" aria-pressed="false">Cena</button>
+    </div>
+
+    <div id="ingGroups"></div>
+
+    <div class="plate-panel">
+      <div class="plate-panel-head">
+        <h3>Tu plato</h3>
+        <button class="clear-btn" id="clearPlate">Vaciar</button>
+      </div>
+      <div id="plateList"></div>
+      <div class="totals-bar">
+        <div class="total-stat"><div class="val" id="totalKcal">0</div><div class="lab">kcal</div><div class="status" id="statusKcal" data-state="vacio">—</div></div>
+        <div class="total-stat"><div class="val" id="totalCarb">0 g</div><div class="lab">carbohidratos</div><div class="status" id="statusCarb" data-state="vacio">—</div></div>
+        <div class="total-stat"><div class="val" id="totalProt">0 g</div><div class="lab">proteína</div><div class="status" id="statusProt" data-state="vacio">—</div></div>
+      </div>
+      <p class="target-note" id="targetNote"></p>
+      <p class="disclaimer">Valores por 100 g según tablas nutricionales estándar (referenciales). Los rangos de referencia se estiman a partir de la pauta y son orientativos. No reemplazan la indicación de tu nutricionista.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Receta -->
+<div class="modal-overlay" id="recipeOverlay">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="recipeTitle">
+    <div class="modal-head">
+      <div>
+        <div class="recipe-tag-row" id="recipeTagRow"></div>
+        <h2 id="recipeTitle"></h2>
+      </div>
+      <button class="modal-close" id="closeRecipe" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="recipe-macros" id="recipeMacros"></div>
+    <div class="recipe-section-title">Ingredientes</div>
+    <ul class="recipe-ing-list" id="recipeIngList"></ul>
+    <div class="recipe-section-title">Preparación sugerida</div>
+    <ol class="recipe-steps" id="recipeSteps"></ol>
+    <p class="disclaimer">Calorías según la pauta de Belén Araya; carbohidratos y proteína, y los pasos de preparación, son estimaciones orientativas.</p>
+  </div>
+</div>
+
+<script>
+const MEALS = [
+  {type:"desayuno", name:"Tostadas con Huevo Revuelto y Tomate", kcal:330, carb:36, prot:35, ing:["2 reb. pan integral (Fuchs/Castaño)","2 huevos revueltos al agua con tomate","200 cc leche proteica"]},
+  {type:"desayuno", name:"Marraqueta con Pasta de Pollo Casera", kcal:340, carb:52, prot:43, ing:["½ marraqueta trozada","70 g pasta casera (pollo desmenuzado + apio/pimentón)","200 cc leche cultivada proteica"]},
+  {type:"desayuno", name:"Tostadas Proteicas con Jamón y Quesillo", kcal:310, carb:33, prot:31, ing:["2 reb. pan integral","2 lám. jamón de pavo","1 trozo de quesillo + pepino","1 yogur proteico (120 g)"]},
+  {type:"desayuno", name:"Huevo Frito al Agua con Marraqueta", kcal:330, carb:54, prot:35, ing:["½ marraqueta","2 huevos fritos al agua","Hojas de rúcula","200 cc leche proteica"]},
+  {type:"desayuno", name:"Huevos Duros con Tomate y Pan Integral", kcal:320, carb:33, prot:34, ing:["2 reb. pan integral","2 huevos duros + tomate","1 yogur proteico (120 g)"]},
+  {type:"desayuno", name:"Sándwich de Pollo y Espinaca", kcal:330, carb:37, prot:44, ing:["2 reb. pan integral","70 g pollo desmenuzado","Espinaca + tomate","200 cc leche proteica"]},
+  {type:"desayuno", name:"Omelette Proteico con Marraqueta", kcal:320, carb:45, prot:26, ing:["Omelette de 2 huevos","2 lám. jamón pavo + tomate","½ marraqueta"]},
+  {type:"desayuno", name:"Marraqueta con Quesillo y Claras", kcal:290, carb:48, prot:32, ing:["½ marraqueta","1 trozo de quesillo","2 claras revueltas con cebollín","1 yogur proteico (120 g)"]},
+
+  {type:"almuerzo", name:"Pollo a la Mostaza con Wok y Arroz", kcal:430, carb:38, prot:70, ing:["200 g pollo a la plancha","2 tazas wok (brócoli, pimentón, zapallo italiano)","100 g arroz integral cocido","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Pescado al Horno con Papa y Ensalada", kcal:410, carb:40, prot:49, ing:["200 g reineta o merluza","1 papa pequeña asada (150 g)","2 tazas ensalada (lechuga, pepino, tomate)","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Bowl de Filete con Quínoa y Verde", kcal:440, carb:29, prot:65, ing:["200 g filete o lomo liso","100 g quínoa cocida","2 tazas ensalada verde (berros, rúcula, apio, palmitos)","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Salpicón de Atún con Cuscús", kcal:420, carb:31, prot:59, ing:["1½ lata atún al agua (enjuagado)","100 g cuscús integral","2 tazas verduras (lechuga, repollo, pimentón, apio)","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Lomo de Cerdo con Fideos Integrales", kcal:450, carb:37, prot:66, ing:["200 g lomo centro de cerdo","100 g fideos integrales","2 tazas champiñones, cebollín y pimentón","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Pavo al Romero con Choclo y Ensalada", kcal:420, carb:27, prot:66, ing:["200 g pechuga de pavo","100 g choclo o arvejas","2 tazas ensalada (lechuga, rabanitos, pepino)","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Pavo a la Plancha con Habas", kcal:410, carb:21, prot:69, ing:["200 g pechuga de pavo","100 g habas cocidas","2 tazas ensalada (tomate, pepino, lechuga)","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Pollo al Curry con Arroz y Brócoli", kcal:430, carb:38, prot:70, ing:["200 g pollo al curry","100 g arroz integral","2 tazas brócoli/coliflor al vapor","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Posta Negra Salteada con Cuscús", kcal:440, carb:35, prot:67, ing:["200 g posta negra en tiras","100 g cuscús integral","2 tazas wok (pimentón, zapallo italiano, dientes de dragón)","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Pescado al Vapor con Quínoa", kcal:400, carb:29, prot:49, ing:["200 g tilapia o merluza","100 g quínoa cocida","2 tazas ensalada (lechuga, repollo, rabanitos)","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Carne Molida con Papa Rústica", kcal:450, carb:40, prot:61, ing:["200 g carne molida 3-4%","1 papa pequeña asada (150 g)","2 tazas ensalada (espinaca, tomate, palmitos)","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Guiso de Pollo con Porotos Verdes", kcal:420, carb:38, prot:70, ing:["200 g pollo en cubos con tomate","100 g arroz integral","2 tazas porotos verdes al vapor","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Asiento de Vacuno con Fideos", kcal:460, carb:33, prot:66, ing:["200 g asiento o abastero","100 g fideos integrales","2 tazas ensalada (rúcula, lechuga, pepino)","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Hamburguesa Casera de Pollo con Quínoa", kcal:460, carb:30, prot:76, ing:["2 hamburguesas caseras de pollo (200 g pollo + 1 huevo)","100 g quínoa cocida","2 tazas ensalada mixta","½ cdta aceite de oliva"]},
+  {type:"almuerzo", name:"Atún a la Plancha con Papa Asada", kcal:410, carb:40, prot:59, ing:["1½ lata atún (o 200 g atún fresco)","1 papa pequeña asada (150 g)","2 tazas ensalada (apio, tomate)","½ cdta aceite de oliva"]},
+
+  {type:"cena", name:"Tacos de Lettuce con Pino Magro", kcal:310, carb:6, prot:56, ing:["200 g carne molida 3-4%","Hojas de lechuga (como taco)","Tomate y pepino picados","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Omelette de Espinaca, Champiñones y Pavo", kcal:320, carb:13, prot:78, ing:["200 g pechuga de pavo","2 huevos (o 2 claras)","2 tazas espinaca y champiñones","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Crema de Espinaca y Coliflor con Pollo", kcal:280, carb:12, prot:67, ing:["200 g pollo desmenuzado","Crema procesada (2 tazas espinaca + coliflor)","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Zapallitos Rellenos con Pino Magro", kcal:320, carb:9, prot:58, ing:["2 zapallos italianos ahuecados","200 g carne molida 3-4% con cebolla","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Hamburguesas de Pollo con Ensalada", kcal:330, carb:9, prot:72, ing:["2 hamburguesas caseras de pollo (200 g pollo + 1 huevo)","2 tazas ensalada (lechuga, pepino, palmitos)","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Tortilla de Atún y Verduras Libres", kcal:310, carb:13, prot:70, ing:["1½ lata atún al agua","2 huevos","2 tazas espinaca y champiñones","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Salteado Oriental de Pollo", kcal:290, carb:12, prot:67, ing:["200 g pollo en tiras","2 tazas (dientes de dragón, pimentón, cebollín, repollo)","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Chacarero Saludable al Plato", kcal:320, carb:14, prot:64, ing:["200 g lomo liso o pollo","2 tazas porotos verdes al vapor","Tomate + mostaza","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Tomate Relleno con Atún y Salsa Yogur", kcal:270, carb:6, prot:55, ing:["1½ lata atún al agua","1 tomate ahuecado + lechuga","Salsa casera de yogur natural con cilantro","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Pescado en Papillote con Verduras", kcal:270, carb:12, prot:47, ing:["200 g reineta o merluza","2 tazas (zapallo italiano, pimentón, cebolla, champiñones)","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Sopa Reconfortante de Verduras y Pollo", kcal:260, carb:12, prot:67, ing:["200 g pollo desmenuzado","2 tazas verduras picadas (apio, espinaca, zapallo italiano)","Caldo casero + ½ cdta aceite de oliva"]},
+  {type:"cena", name:"Puré de Coliflor con Huevos y Pollo", kcal:330, carb:13, prot:74, ing:["200 g pollo a la plancha","Puré de 2 tazas coliflor + 1 huevo duro picado","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Salteado de Pavo con Brócoli", kcal:290, carb:12, prot:65, ing:["200 g pechuga de pavo","2 tazas brócoli y champiñones","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Filete de Vacuno con Ensalada de Rúcula", kcal:330, carb:8, prot:61, ing:["200 g filete o asiento","2 tazas ensalada (rúcula, tomate, palmitos, apio)","½ cdta aceite de oliva"]},
+  {type:"cena", name:"Pollo Gratinado con Quesillo y Ensalada", kcal:320, carb:9, prot:68, ing:["200 g pechuga de pollo","1 lámina de quesillo derretido","2 tazas ensalada (repollo morado, lechuga, pepino)","½ cdta aceite de oliva"]}
+];
+MEALS.forEach((m, i) => { m.id = i; });
+
+const TYPE_LABEL = {desayuno:"Desayuno", almuerzo:"Almuerzo", cena:"Cena"};
+
+// ---------- Búsqueda / filtros de tarjetas ----------
+const grid = document.getElementById('grid');
+const emptyEl = document.getElementById('empty');
+const countEl = document.getElementById('count');
+const searchInput = document.getElementById('search');
+const filterButtons = document.querySelectorAll('#filters .chip');
+
+let activeType = 'todos';
+let query = '';
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function highlight(text, q) {
+  if (!q) return escapeHtml(text);
+  const escaped = escapeHtml(text);
+  const escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('(' + escapedQ + ')', 'ig');
+  return escaped.replace(re, '<mark>$1</mark>');
+}
+function matchesQuery(meal, q) {
+  if (!q) return true;
+  const haystack = (meal.name + ' ' + meal.ing.join(' ')).toLowerCase();
+  return haystack.includes(q);
+}
+
+const kcalValues = MEALS.map(m => m.kcal);
+const KCAL_FLOOR = Math.floor(Math.min(...kcalValues) / 10) * 10;
+const KCAL_CEIL = Math.ceil(Math.max(...kcalValues) / 10) * 10;
+
+const kcalMinInput = document.getElementById('kcalMin');
+const kcalMaxInput = document.getElementById('kcalMax');
+const kcalRangeLabel = document.getElementById('kcalRangeLabel');
+const rangeFill = document.getElementById('rangeFill');
+
+[kcalMinInput, kcalMaxInput].forEach(input => { input.min = KCAL_FLOOR; input.max = KCAL_CEIL; input.step = 10; });
+kcalMinInput.value = KCAL_FLOOR;
+kcalMaxInput.value = KCAL_CEIL;
+
+function updateRangeUI() {
+  let minV = parseInt(kcalMinInput.value, 10);
+  let maxV = parseInt(kcalMaxInput.value, 10);
+  if (minV > maxV) { [minV, maxV] = [maxV, minV]; }
+  const pctMin = ((minV - KCAL_FLOOR) / (KCAL_CEIL - KCAL_FLOOR)) * 100;
+  const pctMax = ((maxV - KCAL_FLOOR) / (KCAL_CEIL - KCAL_FLOOR)) * 100;
+  rangeFill.style.left = pctMin + '%';
+  rangeFill.style.width = (pctMax - pctMin) + '%';
+  kcalRangeLabel.textContent = minV + '–' + maxV + ' kcal';
+  return [minV, maxV];
+}
+let [kcalMinVal, kcalMaxVal] = updateRangeUI();
+[kcalMinInput, kcalMaxInput].forEach(input => {
+  input.addEventListener('input', () => { [kcalMinVal, kcalMaxVal] = updateRangeUI(); renderCards(); });
+});
+
+function renderCards() {
+  const q = query.trim().toLowerCase();
+  const filtered = MEALS.filter(m =>
+    (activeType === 'todos' || m.type === activeType) &&
+    matchesQuery(m, q) &&
+    m.kcal >= kcalMinVal && m.kcal <= kcalMaxVal
+  );
+  grid.innerHTML = filtered.map(m => `
+    <button class="card" type="button" data-type="${m.type}" data-id="${m.id}">
+      <div class="card-top">
+        <span class="tag">${TYPE_LABEL[m.type]}</span>
+        <span class="open-hint">›</span>
+      </div>
+      <h3>${highlight(m.name, q)}</h3>
+      <div class="macro-row"><span><b>${m.kcal}</b> kcal</span><span><b>${m.carb}</b> g carb</span><span><b>${m.prot}</b> g prot</span></div>
+      <ul class="ingredients">${m.ing.map(i => `<li>${highlight(i, q)}</li>`).join('')}</ul>
+    </button>
+  `).join('');
+  emptyEl.style.display = filtered.length ? 'none' : 'block';
+  countEl.textContent = filtered.length === MEALS.length ? `${filtered.length} platos` : `${filtered.length} de ${MEALS.length} platos`;
+}
+searchInput.addEventListener('input', (e) => { query = e.target.value; renderCards(); });
+filterButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeType = btn.dataset.filter;
+    filterButtons.forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+    renderCards();
+  });
+});
+grid.addEventListener('click', (e) => {
+  const card = e.target.closest('.card');
+  if (card) openRecipe(parseInt(card.dataset.id, 10));
+});
+renderCards();
+
+// ---------- Modales: apertura/cierre genérico ----------
+function openModal(overlay) { overlay.classList.add('open'); document.body.classList.add('modal-open'); }
+function closeModal(overlay) { overlay.classList.remove('open'); document.body.classList.remove('modal-open'); }
+
+const builderOverlay = document.getElementById('builderOverlay');
+document.getElementById('openBuilder').addEventListener('click', () => openModal(builderOverlay));
+document.getElementById('closeBuilder').addEventListener('click', () => closeModal(builderOverlay));
+builderOverlay.addEventListener('click', (e) => { if (e.target === builderOverlay) closeModal(builderOverlay); });
+
+const recipeOverlay = document.getElementById('recipeOverlay');
+document.getElementById('closeRecipe').addEventListener('click', () => closeModal(recipeOverlay));
+recipeOverlay.addEventListener('click', (e) => { if (e.target === recipeOverlay) closeModal(recipeOverlay); });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (builderOverlay.classList.contains('open')) closeModal(builderOverlay);
+  if (recipeOverlay.classList.contains('open')) closeModal(recipeOverlay);
+});
+
+// ---------- Receta ----------
+function buildSteps(meal) {
+  const name = meal.name.toLowerCase();
+  const proteinLine = meal.ing[0];
+  let cookVerb;
+  if (name.includes('horno') || name.includes('gratinad')) cookVerb = `Horneá ${proteinLine.toLowerCase()} a 180°C hasta que esté bien cocido.`;
+  else if (name.includes('vapor') || name.includes('papillote')) cookVerb = `Cociná ${proteinLine.toLowerCase()} al vapor (o en papillote) hasta que esté tierno.`;
+  else if (name.includes('salte') || name.includes('wok') || name.includes('curry') || name.includes('mostaza') || name.includes('romero') || name.includes('oriental')) cookVerb = `Saltea ${proteinLine.toLowerCase()} en un sartén bien caliente con ½ cdta de aceite de oliva.`;
+  else if (name.includes('guiso') || name.includes('crema') || name.includes('sopa') || name.includes('puré') || name.includes('pure')) cookVerb = `Cociná ${proteinLine.toLowerCase()} a fuego lento con el resto de los ingredientes hasta lograr la consistencia deseada.`;
+  else if (name.includes('taco')) cookVerb = `Cociná ${proteinLine.toLowerCase()} en sartén con ½ cdta de aceite, sazonando a gusto.`;
+  else if (name.includes('relleno')) cookVerb = `Rellená las verduras con ${proteinLine.toLowerCase()} ya cocido y terminá en el horno unos minutos.`;
+  else if (name.includes('tortilla') || name.includes('omelette')) cookVerb = `Batí los huevos e incorporá ${proteinLine.toLowerCase()} y el resto de los ingredientes; cociná en sartén con ½ cdta de aceite.`;
+  else cookVerb = `Cociná ${proteinLine.toLowerCase()} a la plancha con ½ cdta de aceite de oliva hasta que esté bien cocido por ambos lados.`;
+
+  const steps = [cookVerb];
+
+  const carbLine = meal.ing.find(i => /arroz|quínoa|quinoa|fideos|cuscús|cuscus|papa|choclo|habas/i.test(i));
+  if (carbLine) steps.push(`Preparás ${carbLine.toLowerCase()} según las instrucciones del envase, hasta que esté tierno.`);
+
+  const vegLine = meal.ing.find(i => /taza|verdura|ensalada|espinaca|brócoli|coliflor|porotos|champiñ|lechuga|rúcula/i.test(i));
+  if (vegLine) steps.push(`Lavá y preparás ${vegLine.toLowerCase()} — al vapor, salteadas o en crudo, según prefieras.`);
+
+  steps.push('Serví todo junto, respetando un máximo de ½ cdta de aceite de oliva en total para la comida.');
+  return steps;
+}
+
+function openRecipe(id) {
+  const meal = MEALS.find(m => m.id === id);
+  if (!meal) return;
+  document.getElementById('recipeTitle').textContent = meal.name;
+  document.getElementById('recipeTagRow').innerHTML = `<span class="tag" style="background:var(--${meal.type === 'desayuno' ? 'amber' : meal.type === 'almuerzo' ? 'rust' : 'dusk'}-bg); color:var(--${meal.type === 'desayuno' ? 'amber' : meal.type === 'almuerzo' ? 'rust' : 'dusk'})">${TYPE_LABEL[meal.type]}</span>`;
+  document.getElementById('recipeMacros').innerHTML = `
+    <div class="m"><div class="v">${meal.kcal}</div><div class="l">kcal</div></div>
+    <div class="m"><div class="v">${meal.carb} g</div><div class="l">carbohidratos</div></div>
+    <div class="m"><div class="v">${meal.prot} g</div><div class="l">proteína</div></div>
+  `;
+  document.getElementById('recipeIngList').innerHTML = meal.ing.map(i => `<li>${escapeHtml(i)}</li>`).join('');
+  document.getElementById('recipeSteps').innerHTML = buildSteps(meal).map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  openModal(recipeOverlay);
+}
+
+// ---------- Arma tu plato ----------
+const ING_GROUPS = [
+  { title: "Proteínas", items: [
+    { id:"pollo", name:"Pollo (pechuga cocida)", grams:200, kcal100:165, carb100:0,   prot100:31 },
+    { id:"pavo", name:"Pavo (pechuga cocida)", grams:200, kcal100:135, carb100:0,   prot100:30 },
+    { id:"carne_molida", name:"Carne molida 3-4% (cocida)", grams:200, kcal100:150, carb100:0,   prot100:27 },
+    { id:"filete", name:"Filete / lomo liso (cocido)", grams:200, kcal100:190, carb100:0,   prot100:29 },
+    { id:"cerdo", name:"Lomo de cerdo (cocido)", grams:200, kcal100:180, carb100:0,   prot100:28 },
+    { id:"pescado", name:"Pescado blanco (merluza/reineta)", grams:200, kcal100:100, carb100:0,   prot100:21 },
+    { id:"atun", name:"Atún al agua (escurrido)", grams:200, kcal100:116, carb100:0,   prot100:26 },
+    { id:"huevo", name:"Huevo entero (2 unid.)", grams:100, kcal100:155, carb100:1.1, prot100:13 },
+    { id:"claras", name:"Claras de huevo (2 unid.)", grams:66,  kcal100:52,  carb100:0.7, prot100:11 },
+  ]},
+  { title: "Carbohidratos", items: [
+    { id:"arroz", name:"Arroz integral cocido", grams:100, kcal100:123, carb100:26, prot100:2.7 },
+    { id:"quinoa", name:"Quínoa cocida", grams:100, kcal100:120, carb100:21, prot100:4.4 },
+    { id:"fideos", name:"Fideos integrales cocidos", grams:100, kcal100:124, carb100:25, prot100:5 },
+    { id:"cuscus", name:"Cuscús integral cocido", grams:100, kcal100:112, carb100:23, prot100:3.8 },
+    { id:"papa", name:"Papa asada con piel", grams:150, kcal100:93,  carb100:21, prot100:2.5 },
+    { id:"choclo", name:"Choclo / arvejas", grams:100, kcal100:96,  carb100:19, prot100:3.4 },
+    { id:"habas", name:"Habas cocidas", grams:100, kcal100:88,  carb100:13, prot100:6 },
+  ]},
+  { title: "Verduras", items: [
+    { id:"verd_libres", name:"Verduras libres (lechuga, tomate, pepino…)", grams:200, kcal100:25, carb100:4,  prot100:1.5 },
+    { id:"verd_vapor", name:"Verduras al vapor (brócoli, coliflor, porotos verdes)", grams:200, kcal100:35, carb100:6,  prot100:2.5 },
+  ]},
+  { title: "Pan, lácteos y otros", items: [
+    { id:"pan", name:"Pan integral (2 rebanadas)", grams:60, kcal100:247, carb100:41, prot100:13 },
+    { id:"marraqueta", name:"Marraqueta (½ unidad)", grams:80, kcal100:270, carb100:52, prot100:9 },
+    { id:"leche_prot", name:"Leche proteica (200 cc)", grams:200, kcal100:55,  carb100:5,  prot100:7 },
+    { id:"yogur_prot", name:"Yogur proteico (120 g)", grams:120, kcal100:60,  carb100:4,  prot100:10 },
+    { id:"quesillo", name:"Quesillo (1 trozo)", grams:40, kcal100:173, carb100:3,  prot100:14 },
+    { id:"jamon_pavo", name:"Jamón de pavo (2 láminas)", grams:30, kcal100:99,  carb100:2,  prot100:17 },
+    { id:"aceite", name:"Aceite de oliva (½ cdta)", grams:2.5, kcal100:884, carb100:0,  prot100:0 },
+  ]},
+];
+const ING_BY_ID = {};
+ING_GROUPS.forEach(g => g.items.forEach(i => ING_BY_ID[i.id] = i));
+
+const TARGETS = {
+  almuerzo: { kcal:[400,460], carb:[20,30], prot:[45,65] },
+  cena:     { kcal:[260,330], carb:[0,5],   prot:[45,65] },
+};
+let mealMode = 'almuerzo';
+
+const mealToggleEl = document.getElementById('mealToggle');
+mealToggleEl.querySelectorAll('.chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    mealMode = btn.dataset.meal;
+    mealToggleEl.querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+    renderPlate();
+  });
+});
+
+let plate = {};
+
+const ingGroupsEl = document.getElementById('ingGroups');
+ingGroupsEl.innerHTML = ING_GROUPS.map(g => `
+  <div class="ing-group">
+    <div class="ing-group-title">${g.title}</div>
+    <div class="ing-chips">
+      ${g.items.map(it => `<button class="ing-chip" data-id="${it.id}" aria-pressed="false">+ ${it.name} (${it.grams} g)</button>`).join('')}
+    </div>
+  </div>
+`).join('');
+
+ingGroupsEl.querySelectorAll('.ing-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.id;
+    if (plate[id] !== undefined) { delete plate[id]; btn.setAttribute('aria-pressed', 'false'); }
+    else { plate[id] = ING_BY_ID[id].grams; btn.setAttribute('aria-pressed', 'true'); }
+    renderPlate();
+  });
+});
+
+const plateListEl = document.getElementById('plateList');
+const totalKcalEl = document.getElementById('totalKcal');
+const totalCarbEl = document.getElementById('totalCarb');
+const totalProtEl = document.getElementById('totalProt');
+const statusKcalEl = document.getElementById('statusKcal');
+const statusCarbEl = document.getElementById('statusCarb');
+const statusProtEl = document.getElementById('statusProt');
+const targetNoteEl = document.getElementById('targetNote');
+
+function computeTotals() {
+  let kcal = 0, carb = 0, prot = 0;
+  Object.keys(plate).forEach(id => {
+    const item = ING_BY_ID[id];
+    const grams = plate[id];
+    kcal += item.kcal100 * grams / 100;
+    carb += item.carb100 * grams / 100;
+    prot += item.prot100 * grams / 100;
+  });
+  return { kcal, carb, prot };
+}
+
+function setStatus(el, value, range, hasItems) {
+  if (!hasItems) { el.dataset.state = 'vacio'; el.textContent = '—'; return; }
+  const [min, max] = range;
+  if (value < min) { el.dataset.state = 'bajo'; el.textContent = `bajo · faltan ${Math.round(min - value)}`; }
+  else if (value > max) { el.dataset.state = 'alto'; el.textContent = `alto · sobran ${Math.round(value - max)}`; }
+  else { el.dataset.state = 'ok'; el.textContent = 'en rango'; }
+}
+
+function renderPlate() {
+  const ids = Object.keys(plate);
+  if (ids.length === 0) {
+    plateListEl.innerHTML = '<p class="plate-empty">Todavía no agregaste ingredientes. Tocá los de arriba para sumarlos.</p>';
+  } else {
+    plateListEl.innerHTML = ids.map(id => {
+      const item = ING_BY_ID[id];
+      const grams = plate[id];
+      const kcal = Math.round(item.kcal100 * grams / 100);
+      return `
+        <div class="plate-item" data-id="${id}">
+          <div class="plate-item-name">${item.name}<br><span class="plate-item-macros">~${kcal} kcal</span></div>
+          <input class="grams-input" type="number" min="0" step="5" value="${grams}" data-id="${id}">
+          <span class="grams-unit">g</span>
+          <button class="remove-btn" data-id="${id}" aria-label="Quitar">✕</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const { kcal, carb, prot } = computeTotals();
+  totalKcalEl.textContent = Math.round(kcal);
+  totalCarbEl.textContent = Math.round(carb) + ' g';
+  totalProtEl.textContent = Math.round(prot) + ' g';
+
+  const t = TARGETS[mealMode];
+  const hasItems = ids.length > 0;
+  setStatus(statusKcalEl, kcal, t.kcal, hasItems);
+  setStatus(statusCarbEl, carb, t.carb, hasItems);
+  setStatus(statusProtEl, prot, t.prot, hasItems);
+  targetNoteEl.textContent = `Referencia para ${mealMode}: ${t.kcal[0]}–${t.kcal[1]} kcal · ${t.carb[0]}–${t.carb[1]} g carbohidratos · ${t.prot[0]}–${t.prot[1]} g proteína`;
+
+  plateListEl.querySelectorAll('.grams-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const id = e.target.dataset.id;
+      const val = Math.max(0, parseFloat(e.target.value) || 0);
+      plate[id] = val;
+      const totals = computeTotals();
+      totalKcalEl.textContent = Math.round(totals.kcal);
+      totalCarbEl.textContent = Math.round(totals.carb) + ' g';
+      totalProtEl.textContent = Math.round(totals.prot) + ' g';
+      const tt = TARGETS[mealMode];
+      setStatus(statusKcalEl, totals.kcal, tt.kcal, true);
+      setStatus(statusCarbEl, totals.carb, tt.carb, true);
+      setStatus(statusProtEl, totals.prot, tt.prot, true);
+      const macroEl = e.target.closest('.plate-item').querySelector('.plate-item-macros');
+      macroEl.textContent = `~${Math.round(ING_BY_ID[id].kcal100 * val / 100)} kcal`;
+    });
+  });
+  plateListEl.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.target.dataset.id;
+      delete plate[id];
+      ingGroupsEl.querySelector(`.ing-chip[data-id="${id}"]`).setAttribute('aria-pressed', 'false');
+      renderPlate();
+    });
+  });
+}
+
+document.getElementById('clearPlate').addEventListener('click', () => {
+  plate = {};
+  ingGroupsEl.querySelectorAll('.ing-chip').forEach(b => b.setAttribute('aria-pressed', 'false'));
+  renderPlate();
+});
+
+renderPlate();
+</script>
+</body>
+</html>
